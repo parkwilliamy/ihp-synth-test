@@ -35,7 +35,7 @@ async def test_project(dut):
     dut._log.info("Test project behavior")
 
     rom = load_rom(HEX_PATH)
-    assert len(rom) == 256
+    assert len(rom) == 64
 
     for addr, expected in enumerate(rom):
         dut.uio_in.value = addr

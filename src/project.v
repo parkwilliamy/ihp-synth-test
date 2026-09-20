@@ -16,7 +16,7 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  localparam DEPTH = 256;
+  localparam DEPTH = 64;
 
   wire [7:0] addr = uio_in[7:0];
 
