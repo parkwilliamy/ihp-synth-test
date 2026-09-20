@@ -18,7 +18,7 @@ module tt_um_example (
 
   localparam DEPTH = 256;
 
-  wire [4:0] addr = uio_in[4:0];
+  wire [7:0] addr = uio_in[7:0];
 
   reg [7:0] mem [0:DEPTH-1];
 
