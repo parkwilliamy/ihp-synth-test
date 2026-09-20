@@ -1,9 +1,18 @@
 # SPDX-FileCopyrightText: © 2024 Tiny Tapeout
 # SPDX-License-Identifier: Apache-2.0
 
+import os
+
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
+
+HEX_PATH = os.path.join(os.path.dirname(__file__), "..", "src", "testmem.hex")
+
+
+def load_rom(path):
+    with open(path) as f:
+        return [int(line, 16) for line in f if line.strip()]
 
 
 @cocotb.test()
@@ -25,7 +34,12 @@ async def test_project(dut):
 
     dut._log.info("Test project behavior")
 
-    for i in range(256):
-        dut.uio_in.value = i
+    rom = load_rom(HEX_PATH)
+    assert len(rom) == 256
+
+    for addr, expected in enumerate(rom):
+        dut.uio_in.value = addr
         await ClockCycles(dut.clk, 1)
-        assert dut.uo_out.value == i % 32
+        assert dut.uo_out.value == expected, (
+            f"addr {addr:#04x}: got {int(dut.uo_out.value):#04x}, expected {expected:#04x}"
+        )
