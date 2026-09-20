@@ -17,13 +17,35 @@ module tt_um_example (
 );
 
   localparam DEPTH = 64;
+  localparam AW    = $clog2(DEPTH);
 
-  wire [7:0] addr = uio_in[7:0];
+  wire [AW-1:0] addr = uio_in[AW-1:0];
 
   reg [7:0] mem [0:DEPTH-1];
 
+  // ---------------------------------------------------------------------------
+  // Keep exactly ONE of the two blocks below active.
+  // ---------------------------------------------------------------------------
+
+  // ROM: contents come from testmem.hex (256 random bytes; only the first
+  // DEPTH entries are used).
+  /*
   initial begin
     $readmemh("../src/testmem.hex", mem);
+  end
+  */
+
+  // RAM: same read path as the ROM, plus a synchronous write port.
+  // There is no spare input pin for a dedicated write-enable (uio_in is the
+  // address, ui_in is the data), so rst_n doubles as the write strobe:
+  // while rst_n is LOW, ui_in is written to mem[addr] on every rising clock
+  // edge; while rst_n is HIGH the memory is read-only.
+  wire       we    = ~rst_n;
+  wire [7:0] wdata = ui_in;
+
+  always @(posedge clk) begin
+    if (we)
+      mem[addr] <= wdata;
   end
 
   wire [7:0] out_val = mem[addr];
