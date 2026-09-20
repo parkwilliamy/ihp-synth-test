@@ -16,12 +16,21 @@ module tt_um_example (
     input  wire       rst_n     // reset_n - low to reset
 );
 
+  localparam DEPTH = 32;
+
+  wire [4:0] addr = uio_in[4:0];
+
+  reg [7:0] mem [0:DEPTH-1];
+
+  initial begin
+    $readmemh("../src/testmem.hex", mem);
+  end
+
+  wire [7:0] out_val = mem[addr];
+
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
+  assign uo_out  = ena ? out_val : 8'bz;
   assign uio_out = 0;
   assign uio_oe  = 0;
-
-  // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
 
 endmodule
