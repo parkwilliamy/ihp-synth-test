@@ -25,7 +25,7 @@ async def test_project(dut):
 
     dut._log.info("Test project behavior")
 
-    for i in range(32):
+    for i in range(256):
         dut.uio_in.value = i
         await ClockCycles(dut.clk, 1)
-        assert dut.uo_out.value == i
+        assert dut.uo_out.value == i % 32
